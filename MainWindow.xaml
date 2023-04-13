@@ -6,8 +6,11 @@
         xmlns:local="clr-namespace:MouseTracking"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        <Button Content="Record" HorizontalAlignment="Left" Margin="127,184,0,0" VerticalAlignment="Top" Width="149" Click="Button_Click"/>
 
+    <Grid x:Name="grid">
+        <Button Content="Record" HorizontalAlignment="Left" Margin="127,184,0,0" VerticalAlignment="Top" Width="149" Click="Button_Record"/>
+        <Button Content="Stop recording" HorizontalAlignment="Left" Margin="349,184,0,0" VerticalAlignment="Top" Width="125" Click="Button_StopRecord"/>
+        <Button Content="Show activity" HorizontalAlignment="Left" Margin="585,204,0,0" VerticalAlignment="Top" Width="135" Click="Button_ShowActivity"/>
     </Grid>
+
 </Window>
