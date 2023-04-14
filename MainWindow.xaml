@@ -5,12 +5,24 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MouseTracking"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="758" Width="781">
 
-    <Grid x:Name="grid">
-        <Button Content="Record" HorizontalAlignment="Left" Margin="127,184,0,0" VerticalAlignment="Top" Width="149" Click="Button_Record"/>
-        <Button Content="Stop recording" HorizontalAlignment="Left" Margin="349,184,0,0" VerticalAlignment="Top" Width="125" Click="Button_StopRecord"/>
-        <Button Content="Show activity" HorizontalAlignment="Left" Margin="585,204,0,0" VerticalAlignment="Top" Width="135" Click="Button_ShowActivity"/>
+    <Grid x:Name="grid" Margin="10,10,10,0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0*"/>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="0*"/>
+        </Grid.ColumnDefinitions>
+        <Button Content="ReadDataBtn" HorizontalAlignment="Left" Margin="168,129,0,0" VerticalAlignment="Top" Height="54" Width="96" Click="Button_Click" Grid.ColumnSpan="2"/>
+        <Button Content="Analyse" HorizontalAlignment="Left" Margin="323,143,0,0" VerticalAlignment="Top" Height="27" Width="76" Click="Button_Click_1" Grid.ColumnSpan="2"/>
+        <Button Content="Display bitmap" HorizontalAlignment="Left" Height="57" Margin="530,123,0,0" VerticalAlignment="Top" Width="114" Click="Button_Click_3" Grid.Column="1"/>
+
+        <!--<Button Content="Display Image" Click="Button_Click_2" Grid.ColumnSpan="2" Margin="0,0,799,0" />-->
+        <Image x:Name="mouseHeatmap" Grid.ColumnSpan="2" Margin="0,0,667,0"/>
+        <Button Content="Record coords" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="80,152,0,0" VerticalAlignment="Top" Click="Button_Click_2"/>
+        <Button Content="Stop rec" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="16" Margin="80,204,0,0" VerticalAlignment="Top" Width="68" Click="Button_Click_4"/>
+        <Canvas x:Name="myCanvas" Margin="168,286,187,241" Grid.Column="1"/>
+
     </Grid>
 
 </Window>
