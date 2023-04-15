@@ -20,8 +20,8 @@ namespace MouseTracking
     /// </summary>
     public partial class ThirdWindow : Window
     {
-        private const int ImageWidth = 800;
-        private const int ImageHeight = 600;
+        private const int ImageWidth = 1920;
+        private const int ImageHeight = 1080;
 
         private WriteableBitmap heatmapBitmap;
         private byte[] heatmapPixels;
