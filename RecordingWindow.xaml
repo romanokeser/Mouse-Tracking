@@ -1,0 +1,15 @@
+﻿<Window x:Class="MouseTracking.RecordingWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MouseTracking"
+        mc:Ignorable="d"
+        Title="RecordingWindow" Height="450" Width="800">
+    <Grid>
+        <Button x:Name="RecButton" Content="Record" HorizontalAlignment="Left" Height="25" Margin="65,62,0,0" VerticalAlignment="Top" Width="87" Click="RecButton_Click"/>
+        <Button x:Name="StopRecButton" Content="Stop Rec" HorizontalAlignment="Left" Height="25" Margin="65,117,0,0" VerticalAlignment="Top" Width="87" Click="StopRecButton_Click"/>
+        <Button x:Name="DiagnosticsButton" Content="Show diagnostics" HorizontalAlignment="Left" Height="42" Margin="223,87,0,0" VerticalAlignment="Top" Width="141" Click="DiagnosticsButton_Click"/>
+
+    </Grid>
+</Window>

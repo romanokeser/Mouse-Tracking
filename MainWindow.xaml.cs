@@ -31,18 +31,10 @@ namespace MouseTracking
         private StreamWriter writer;
 
         string fileName = "MouseCoords.txt";
+
         [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool GetCursorPos(out System.Drawing.Point lpPoint);
 
-        static extern bool GetCursorPos(out POINT lpPoint);
-
-
-        [StructLayout(LayoutKind.Sequential)]
-        struct POINT
-        {
-            public int X;
-            public int Y;
-        }
 
         public MainWindow()
         {
@@ -111,12 +103,13 @@ namespace MouseTracking
             using (StreamWriter writer = new StreamWriter(fileName))
             {
                 int count = 0;
-                while (count < 1000)
+                while (true)
                 {
-                    System.Windows.Point mousePosition = Mouse.GetPosition(null);
+                    System.Drawing.Point mousePosition;
+                    GetCursorPos(out mousePosition);
                     string coordsString = $"{mousePosition.X},{mousePosition.Y}";
                     writer.WriteLine(coordsString);
-                    count++;
+                    Thread.Sleep(1000); // Wait for 1 second
                 }
             }
         }
