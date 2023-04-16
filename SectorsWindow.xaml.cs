@@ -96,23 +96,31 @@ namespace MouseTracking
             }
         }
 
-        private void ApplyAlphaChangesToDrawnRectangles()
+        /// <summary>
+        ///  Loops through the list of mouse coordinates _mouseCoords, checks if each coordinate is within any of the drawn rectangles, 
+        ///  and applies changes to the fill color of the rectangle
+        ///  It also checks if any of the mouse clicks _mouseClicksCoords are within the same rectangle and applies a different fill color. 
+        /// </summary>
+        private void UpdateDrawnRectangles()
         {
             int left = 0;
             int top = 0;
             int right = 0;
             int bottom = 0;
+
             foreach (System.Drawing.Point mouseCoord in _mouseCoords)
             {
                 int rectangleIndex = -1;
                 for (int i = 0; i < _drawnRectangles.Count; i++)
                 {
+                    // Get the position coordinates of the current rectangle
                     int[,] posXY = _drawnRectangles[i].posXY!;
                     left = posXY[0, 0];
                     top = posXY[0, 1];
                     right = posXY[1, 0];
                     bottom = posXY[1, 1];
 
+                    // Check if the mouse coordinate is within the current rectangle
                     if (mouseCoord.X >= left && mouseCoord.X <= right &&
                         mouseCoord.Y >= top && mouseCoord.Y <= bottom)
                     {
@@ -121,9 +129,13 @@ namespace MouseTracking
                     }
                 }
 
+                // If a matching rectangle was found
                 if (rectangleIndex != -1)
                 {
+                    // Get the matching rectangle from the canvas
                     Rectangle rectangle = canvas.Children[rectangleIndex] as Rectangle;
+
+                    // Get the brush used to fill the rectangle
                     SolidColorBrush brush = rectangle.Fill as SolidColorBrush;
                     if (brush == null)
                     {
@@ -137,7 +149,7 @@ namespace MouseTracking
                     }
                     brush.Color = Color.FromArgb((byte)alpha, brush.Color.R, brush.Color.G, brush.Color.B);
 
-                    // Check if the mouse click point is within the rectangle
+                    // Check if any of the mouse clicks occurred within the current rectangle
                     if (_mouseClicksCoords.Any(clickCoord =>
                         clickCoord.X >= left && clickCoord.X <= right &&
                         clickCoord.Y >= top && clickCoord.Y <= bottom))
@@ -150,7 +162,7 @@ namespace MouseTracking
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            ApplyAlphaChangesToDrawnRectangles();
+            UpdateDrawnRectangles();
         }
     }
 
