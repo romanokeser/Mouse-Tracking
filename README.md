@@ -8,4 +8,4 @@ recording mouse pos
 applying alpha changes to each sector 
 ![alt text](https://github.com/romanokeser/Mouse-Tracking/blob/main/ProgressImages/1st.png)
 applying red color to mouse clicks
-![alt text](https://github.com/romanokeser/Mouse-Tracking/blob/main/ProgressImages/1st.png)
+![alt text](https://github.com/romanokeser/Mouse-Tracking/blob/main/ProgressImages/MouseClicks.png)
