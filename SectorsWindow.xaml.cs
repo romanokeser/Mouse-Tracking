@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -10,15 +12,18 @@ namespace MouseTracking
 {
     public partial class SectorsWindow : Window
     {
+        private StreamWriter _streamWriter;
+
         private List<System.Drawing.Point> _mouseCoords = new List<System.Drawing.Point>();
+        private List<System.Drawing.Point> _mouseClicksCoords = new List<System.Drawing.Point>();
         private List<DrawnRectangle> _drawnRectangles = new List<DrawnRectangle>();
 
         public SectorsWindow()
         {
             InitializeComponent();
             InitCoords();
+            InitClickCoords();
             canvas.Loaded += Canvas_Loaded;
-            
         }
 
         private void Canvas_Loaded(object sender, RoutedEventArgs e)
@@ -44,6 +49,25 @@ namespace MouseTracking
             }
             _mouseCoords = mouseCoords;
         }
+
+        private void InitClickCoords()
+        {
+            List<System.Drawing.Point> mouseClickCoords = new List<System.Drawing.Point>();
+            string filePath = "MouseClicksCoords.txt";
+            using (StreamReader reader = new StreamReader(filePath))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    string[] parts = line.Split(',');
+                    double x = double.Parse(parts[0]);
+                    double y = double.Parse(parts[1]);
+                    mouseClickCoords.Add(new System.Drawing.Point((int)x, (int)y));
+                }
+            }
+            _mouseClicksCoords = mouseClickCoords;
+        }
+
 
         private void DrawRectangleSectors()
         {
@@ -74,16 +98,20 @@ namespace MouseTracking
 
         private void ApplyAlphaChangesToDrawnRectangles()
         {
+            int left = 0;
+            int top = 0;
+            int right = 0;
+            int bottom = 0;
             foreach (System.Drawing.Point mouseCoord in _mouseCoords)
             {
                 int rectangleIndex = -1;
                 for (int i = 0; i < _drawnRectangles.Count; i++)
                 {
                     int[,] posXY = _drawnRectangles[i].posXY!;
-                    int left = posXY[0, 0];
-                    int top = posXY[0, 1];
-                    int right = posXY[1, 0];
-                    int bottom = posXY[1, 1];
+                    left = posXY[0, 0];
+                    top = posXY[0, 1];
+                    right = posXY[1, 0];
+                    bottom = posXY[1, 1];
 
                     if (mouseCoord.X >= left && mouseCoord.X <= right &&
                         mouseCoord.Y >= top && mouseCoord.Y <= bottom)
@@ -108,10 +136,17 @@ namespace MouseTracking
                         alpha = 0;
                     }
                     brush.Color = Color.FromArgb((byte)alpha, brush.Color.R, brush.Color.G, brush.Color.B);
+
+                    // Check if the mouse click point is within the rectangle
+                    if (_mouseClicksCoords.Any(clickCoord =>
+                        clickCoord.X >= left && clickCoord.X <= right &&
+                        clickCoord.Y >= top && clickCoord.Y <= bottom))
+                    {
+                        brush.Color = Colors.Red;
+                    }
                 }
             }
         }
-
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
