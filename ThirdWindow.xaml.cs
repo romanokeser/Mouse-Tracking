@@ -71,8 +71,8 @@ namespace MouseTracking
             if (pixelX >= 0 && pixelX < ImageWidth && pixelY >= 0 && pixelY < ImageHeight)
             {
                 int distance = Distance(new System.Drawing.Point(ImageWidth / 2, ImageHeight / 2), mousePos);
-                int density = (255 - distance) / 4; // Scale the density to fit within 0-255
-                Color color = Color.FromArgb(255, 0, (byte)(255 - density), (byte)density); // Map the density value to a color
+                //int density = (255 - distance) / 4; // Scale the density to fit within 0-255
+                Color color = Color.FromArgb(255, 0, (byte)(255 /*- density*/), (byte)255); // Map the density value to a color
                 byte[] pixelValues = new byte[] { color.B, color.G, color.R, 0 }; // Convert the color to BGR values
                 int stride = ImageWidth * 4; // 4 bytes per pixel (BGR0)
                 heatmapBitmap.WritePixels(new Int32Rect(pixelX, pixelY, 1, 1), pixelValues, stride, 0); // Set the pixel value
