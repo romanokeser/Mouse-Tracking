@@ -10,7 +10,7 @@ using System.Windows.Shapes;
 
 namespace MouseTracking
 {
-    public partial class SectorsWindow : Window
+    public partial class MouseAnalyser : Window
     {
         private StreamWriter _streamWriter;
 
@@ -18,7 +18,7 @@ namespace MouseTracking
         private List<System.Drawing.Point> _mouseClicksCoords = new List<System.Drawing.Point>();
         private List<DrawnRectangle> _drawnRectangles = new List<DrawnRectangle>();
 
-        public SectorsWindow()
+        public MouseAnalyser()
         {
             InitializeComponent();
             InitCoords();
