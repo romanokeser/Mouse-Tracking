@@ -74,13 +74,12 @@ namespace MouseTracking
 
         private void ApplyAlphaChangesToDrawnRectangles()
         {
-            //iterate through the list of mouse coordinates
-            //iterate through the lit of drawnRectangles and check how many points of mouse coordinate is inside
             foreach (System.Drawing.Point mouseCoord in _mouseCoords)
             {
-                foreach (DrawnRectangle drawnRectangle in _drawnRectangles)
+                int rectangleIndex = -1;
+                for (int i = 0; i < _drawnRectangles.Count; i++)
                 {
-                    int[,] posXY = drawnRectangle.posXY!;
+                    int[,] posXY = _drawnRectangles[i].posXY!;
                     int left = posXY[0, 0];
                     int top = posXY[0, 1];
                     int right = posXY[1, 0];
@@ -89,23 +88,30 @@ namespace MouseTracking
                     if (mouseCoord.X >= left && mouseCoord.X <= right &&
                         mouseCoord.Y >= top && mouseCoord.Y <= bottom)
                     {
-                        Rectangle rectangle = canvas.Children[_drawnRectangles.IndexOf(drawnRectangle)] as Rectangle;
-                        SolidColorBrush brush = rectangle.Fill as SolidColorBrush;
-                        if (brush == null)
-                        {
-                            brush = new SolidColorBrush(Colors.Blue);
-                            rectangle.Fill = brush;
-                        }
-                        double alpha = brush.Color.A - 10;
-                        if (alpha < 0)
-                        {
-                            alpha = 0;
-                        }
-                        brush.Color = Color.FromArgb((byte)alpha, brush.Color.R, brush.Color.G, brush.Color.B);
+                        rectangleIndex = i;
+                        break;
                     }
+                }
+
+                if (rectangleIndex != -1)
+                {
+                    Rectangle rectangle = canvas.Children[rectangleIndex] as Rectangle;
+                    SolidColorBrush brush = rectangle.Fill as SolidColorBrush;
+                    if (brush == null)
+                    {
+                        brush = new SolidColorBrush(Colors.Blue);
+                        rectangle.Fill = brush;
+                    }
+                    double alpha = brush.Color.A - 10;
+                    if (alpha < 0)
+                    {
+                        alpha = 0;
+                    }
+                    brush.Color = Color.FromArgb((byte)alpha, brush.Color.R, brush.Color.G, brush.Color.B);
                 }
             }
         }
+
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
