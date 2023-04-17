@@ -5,6 +5,7 @@ using System.IO;
 using System.Drawing;
 using MoreLinq;
 using MoreLinq.Extensions;
+using System.Threading.Tasks;
 
 namespace MouseTracking
 {
@@ -17,33 +18,44 @@ namespace MouseTracking
         {
             InitializeComponent();
 
-            double[][] coordinates = File.ReadLines("MouseCoords.txt")
-                             .Select(line => line.Split(',')
-                                                   .Select(str => double.Parse(str))
-                                                   .ToArray())
-                             .ToArray();
+            Task.Run(() => ProcessHeatmapAsync());
+        }
+
+        private async Task ProcessHeatmapAsync()
+        {
+            double[][] coordinates = File.ReadAllLines("MouseCoords.txt")
+                                          .Select(line => line.Split(',')
+                                                                .Select(str => double.Parse(str))
+                                                                .ToArray())
+                                          .ToArray();
 
             double[,] coordinates2D = coordinates.ToRectangularArray();
 
-            double[,] heatmap = MakeHeatmap(coordinates2D);
+            double[,] heatmap = await Task.Run(() => MakeHeatmap(coordinates2D));
             heatmap = MultiplyScalar(heatmap, 255.0 / GetMax(heatmap));
-            SaveHeatmap(heatmap);
+            await SaveHeatmapAsync(heatmap);
         }
+
+
 
         static double[,] MakeHeatmap(double[,] coordinates)
         {
             int height = 1080;
             int width = 2048;
             double[,] heatmap = new double[height, width];
-            for (int i = 0; i < coordinates.GetLength(0); i++)
+            Parallel.For(0, coordinates.GetLength(0), i =>
             {
                 double[] gx = GKern(coordinates[i, 0], height);
                 double[] gy = GKern(coordinates[i, 1], width);
                 double[,] kernel = OuterProduct(gx, gy);
-                heatmap = AddMatrices(heatmap, kernel);
-            }
+                lock (heatmap)
+                {
+                    heatmap = AddMatrices(heatmap, kernel);
+                }
+            });
             return heatmap;
         }
+
 
         static double[] GKern(double c, int l, double sig = 10.0)
         {
@@ -82,55 +94,60 @@ namespace MouseTracking
             return result;
         }
 
-        static double[,] MultiplyScalar(double[,] matrix, double scalar)
+        static double[,] MultiplyScalar(double[,] arr, double scalar)
         {
-            int height = matrix.GetLength(0);
-            int width = matrix.GetLength(1);
+            int height = arr.GetLength(0);
+            int width = arr.GetLength(1);
             double[,] result = new double[height, width];
             for (int i = 0; i < height; i++)
             {
                 for (int j = 0; j < width; j++)
                 {
-                    result[i, j] = matrix[i, j] * scalar;
+                    result[i, j] = arr[i, j] * scalar;
                 }
             }
             return result;
         }
 
-        static double GetMax(double[,] matrix)
+        static double GetMax(double[,] arr)
         {
-            double max = matrix[0, 0];
-            int height = matrix.GetLength(0);
-            int width = matrix.GetLength(1);
+            double max = double.MinValue;
+            int height = arr.GetLength(0);
+            int width = arr.GetLength(1);
             for (int i = 0; i < height; i++)
             {
                 for (int j = 0; j < width; j++)
                 {
-                    if (matrix[i, j] > max)
+                    if (arr[i, j] > max)
                     {
-                        max = matrix[i, j];
+                        max = arr[i, j];
                     }
                 }
             }
             return max;
         }
 
-        static void SaveHeatmap(double[,] heatmap)
+
+
+        private async Task SaveHeatmapAsync(double[,] heatmap)
         {
-            Bitmap bitmap = new Bitmap(heatmap.GetLength(1), heatmap.GetLength(0));
             int height = heatmap.GetLength(0);
             int width = heatmap.GetLength(1);
-            Bitmap image = new Bitmap(width, height);
+            Bitmap bmp = new Bitmap(width, height);
             for (int i = 0; i < height; i++)
             {
                 for (int j = 0; j < width; j++)
                 {
-                    int value = (int)Math.Round(heatmap[i, j]);
-                    System.Drawing.Color color = System.Drawing.Color.FromArgb(value, value, value);
-                    image.SetPixel(j, i, color);
+                    int intensity = (int)heatmap[i, j];
+                    Color color = Color.FromArgb(intensity, intensity, intensity);
+                    bmp.SetPixel(j, i, color);
                 }
             }
-            image.Save("Heatmap.png", System.Drawing.Imaging.ImageFormat.Png);
+            string filename = "heatmap.jpg";
+            using (FileStream fs = new FileStream(filename, FileMode.Create))
+            {
+                await Task.Run(() => bmp.Save(fs, System.Drawing.Imaging.ImageFormat.Jpeg));
+            }
         }
     }
 }
