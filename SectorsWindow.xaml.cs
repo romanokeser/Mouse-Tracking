@@ -10,23 +10,20 @@ using System.Windows.Shapes;
 
 namespace MouseTracking
 {
-    public partial class MouseAnalyser : Window
+    public partial class SectorsWindow : Window
     {
         private StreamWriter _streamWriter;
 
         private List<System.Drawing.Point> _mouseCoords = new List<System.Drawing.Point>();
         private List<System.Drawing.Point> _mouseClicksCoords = new List<System.Drawing.Point>();
         private List<DrawnRectangle> _drawnRectangles = new List<DrawnRectangle>();
-        private static readonly Random _random = new Random();
 
-        public MouseAnalyser()
+        public SectorsWindow()
         {
             InitializeComponent();
             InitCoords();
             InitClickCoords();
             canvas.Loaded += Canvas_Loaded;
-            alphaSlider.ValueChanged += AlphaSlider_ValueChanged;
-
         }
 
         private void Canvas_Loaded(object sender, RoutedEventArgs e)
@@ -86,53 +83,36 @@ namespace MouseTracking
                         Width = rectSize,
                         Height = rectSize,
                         Stroke = Brushes.Black,
-                        StrokeThickness = 1,
-                        Fill = new SolidColorBrush(Color.FromArgb(128, 0, 0, 255)) // Default alpha value of 128
+                        StrokeThickness = 1
                     };
                     Canvas.SetLeft(rectangle, x);
                     Canvas.SetTop(rectangle, y);
                     canvas.Children.Add(rectangle);
                     _drawnRectangles.Add(new DrawnRectangle()
                     {
-                        posXY = new int[,] { { x, y }, { x + rectSize, y + rectSize } },
-                        alpha = 128 // Default alpha value of 128
+                        posXY = new int[,] { { x, y }, { x + rectSize, y + rectSize } }
                     });
                 }
             }
         }
 
-
-        private void AlphaSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            UpdateDrawnRectangles();
-        }
-
-        /// <summary>
-        ///  Loops through the list of mouse coordinates _mouseCoords, checks if each coordinate is within any of the drawn rectangles, 
-        ///  and applies changes to the fill color of the rectangle
-        ///  It also checks if any of the mouse clicks _mouseClicksCoords are within the same rectangle and applies a different fill color. 
-        /// </summary>
-        private void UpdateDrawnRectangles()
+        private void ApplyAlphaChangesToDrawnRectangles()
         {
             int left = 0;
             int top = 0;
             int right = 0;
             int bottom = 0;
-
             foreach (System.Drawing.Point mouseCoord in _mouseCoords)
             {
                 int rectangleIndex = -1;
                 for (int i = 0; i < _drawnRectangles.Count; i++)
                 {
-                    // Get the position coordinates and alpha value of the current rectangle
                     int[,] posXY = _drawnRectangles[i].posXY!;
-                    byte alpha = _drawnRectangles[i].alpha;
                     left = posXY[0, 0];
                     top = posXY[0, 1];
                     right = posXY[1, 0];
                     bottom = posXY[1, 1];
 
-                    // Check if the mouse coordinate is within the current rectangle
                     if (mouseCoord.X >= left && mouseCoord.X <= right &&
                         mouseCoord.Y >= top && mouseCoord.Y <= bottom)
                     {
@@ -141,79 +121,41 @@ namespace MouseTracking
                     }
                 }
 
-                // If a matching rectangle was found
                 if (rectangleIndex != -1)
                 {
-                    // Get the matching rectangle from the canvas
                     Rectangle rectangle = canvas.Children[rectangleIndex] as Rectangle;
-
-                    // Get the brush used to fill the rectangle
                     SolidColorBrush brush = rectangle.Fill as SolidColorBrush;
                     if (brush == null)
                     {
                         brush = new SolidColorBrush(Colors.Blue);
                         rectangle.Fill = brush;
                     }
+                    double alpha = brush.Color.A - 10;
+                    if (alpha < 0)
+                    {
+                        alpha = 0;
+                    }
+                    brush.Color = Color.FromArgb((byte)alpha, brush.Color.R, brush.Color.G, brush.Color.B);
 
-                    // Update the alpha value of the brush
-                    byte alpha = _drawnRectangles[rectangleIndex].alpha;
-                    brush.Color = Color.FromArgb(alpha, brush.Color.R, brush.Color.G, brush.Color.B);
-
-                    // Check if any of the mouse clicks occurred within the current rectangle
+                    // Check if the mouse click point is within the rectangle
                     if (_mouseClicksCoords.Any(clickCoord =>
                         clickCoord.X >= left && clickCoord.X <= right &&
-                        clickCoord.Y >= top && clickCoord.Y <= bottom
-
-
-        ))
+                        clickCoord.Y >= top && clickCoord.Y <= bottom))
                     {
-                        // Set the rectangle's fill to red
-                        rectangle.Fill = new SolidColorBrush(Colors.Red);
+                        brush.Color = Colors.Red;
                     }
                 }
-                else // If no matching rectangle was found
-                {
-                    // Create a new rectangle with a random color and alpha value
-                    SolidColorBrush brush = new SolidColorBrush(RandomColor());
-                    byte alpha = (byte)_random.Next(50, 200);
-
-                    Rectangle newRectangle = new Rectangle
-                    {
-                        Width = 50,
-                        Height = 50,
-                        Fill = brush,
-                        Opacity = alpha / 255.0,
-                        Margin = new Thickness(mouseCoord.X - 25, mouseCoord.Y - 25, 0, 0)
-                    };
-
-                    // Add the new rectangle to the canvas and to the list of drawn rectangles
-                    canvas.Children.Add(newRectangle);
-                    _drawnRectangles.Add(new DrawnRectangle
-                    {
-                        posXY = new int[,] { { mouseCoord.X - 25, mouseCoord.Y - 25 }, { mouseCoord.X + 25, mouseCoord.Y + 25 } },
-                        alpha = alpha
-                    });
-                }
-
             }
-        }
-
-        private Color RandomColor()
-        {
-            byte[] rgb = new byte[3];
-            _random.NextBytes(rgb);
-            return Color.FromRgb(rgb[0], rgb[1], rgb[2]);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            ApplyAlphaChangesToDrawnRectangles();
         }
     }
 
     public class DrawnRectangle
     {
         public int[,]? posXY;
-        public byte alpha { get; set; }
-
     }
 }

@@ -1,18 +1,15 @@
-﻿<Window x:Class="MouseTracking.MouseAnalyser"
+﻿<Window x:Class="MouseTracking.SectorsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MouseTracking"
-        WindowStyle="SingleBorderWindow" 
+        WindowStyle="None" 
         WindowState="Maximized"
-        mc:Ignorable="d"
-        Title="SectorsWindow" Height="1920" Width="1080">
 
+    mc:Ignorable="d"
+        Title="SectorsWindow" Height="1920" Width="1080" >
     <Canvas x:Name="canvas" Background="White">
-        <!-- Set ZIndex of slider control to a high value -->
-        <Slider x:Name="alphaSlider" Minimum="0" Maximum="255" Value="128" HorizontalAlignment="Left" VerticalAlignment="Top" Width="142" Canvas.Left="67" Canvas.Top="36" Canvas.ZIndex="999"/>
         <Button Content="Button" Height="69" Canvas.Left="457" Canvas.Top="19" Width="168" Click="Button_Click"/>
     </Canvas>
-
 </Window>
