@@ -6,6 +6,7 @@ using System.Drawing;
 using MoreLinq;
 using MoreLinq.Extensions;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace MouseTracking
 {
@@ -23,18 +24,31 @@ namespace MouseTracking
 
         private async Task ProcessHeatmapAsync()
         {
-            double[][] coordinates = File.ReadAllLines("MouseCoords.txt")
-                                          .Select(line => line.Split(',')
-                                                                .Select(str => double.Parse(str))
-                                                                .ToArray())
-                                          .ToArray();
+            using (StreamReader reader = new StreamReader("MouseCoords.txt"))
+            {
+                double[,] coordinates = null;
+                string line;
+                int row = 0;
+                while ((line = await reader.ReadLineAsync()) != null)
+                {
+                    string[] values = line.Split(',');
+                    if (coordinates == null)
+                    {
+                        coordinates = new double[values.Length, values.Length];
+                    }
+                    for (int col = 0; col < values.Length; col++)
+                    {
+                        coordinates[row, col] = double.Parse(values[col]);
+                    }
+                    row++;
+                }
 
-            double[,] coordinates2D = coordinates.ToRectangularArray();
-
-            double[,] heatmap = await Task.Run(() => MakeHeatmap(coordinates2D));
-            heatmap = MultiplyScalar(heatmap, 255.0 / GetMax(heatmap));
-            await SaveHeatmapAsync(heatmap);
+                double[,] heatmap = await Task.Run(() => MakeHeatmap(coordinates));
+                heatmap = MultiplyScalar(heatmap, 255.0 / GetMax(heatmap));
+                await SaveHeatmapAsync(heatmap);
+            }
         }
+
 
 
 
