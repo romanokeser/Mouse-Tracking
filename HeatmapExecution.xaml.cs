@@ -25,25 +25,26 @@ namespace MouseTracking
 
         private async Task ProcessHeatmapAsync()
         {
+            // Read the text file "MouseCoords.txt" and parse each line into an array of doubles
             double[][] coordinates = File.ReadAllLines("MouseCoords.txt")
                                           .Select(line => line.Split(',')
                                                                 .Select(str => double.Parse(str))
                                                                 .ToArray())
                                           .ToArray();
 
-            double[,] coordinates2D = coordinates.ToRectangularArray();
+            double[,] coordinates2D = coordinates.ToRectangularArray();     // Convert the jagged array of doubles to a rectangular 2D array
+
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            double[,] heatmap = await Task.Run(() => MakeHeatmap(coordinates2D));
+            double[,] heatmap = await Task.Run(() => MakeHeatmap(coordinates2D));// Calculate the heatmap using the MakeHeatmap method
             stopwatch.Stop();
+
             TimeSpan ts = stopwatch.Elapsed;
             Console.WriteLine($"MakeHeatmap execution time: {ts.TotalMilliseconds} ms");
 
-            heatmap = MultiplyScalar(heatmap, 255.0 / GetMax(heatmap));
+            heatmap = MultiplyScalar(heatmap, 255.0 / GetMax(heatmap));     // Normalize the heatmap by multiplying it with a scaling factor and save it to a file
             await SaveHeatmapAsync(heatmap);
         }
-
-
 
         /// <summary>
         /// Creates a heatmap from a 2D array of mouse coordinates using Gaussian kernels
@@ -69,7 +70,18 @@ namespace MouseTracking
             return heatmap;
         }
 
-
+        /// <summary>
+        /// Calculates a Gaussian kernel for a given center point c and length l. 
+        /// The kernel values are calculated based on a Gaussian distribution formula, 
+        /// where the distance between the center point and each point in the kernel is used as the input variable to the formula. 
+        /// The standard deviation of the Gaussian distribution is set to 10 by default, 
+        /// but can be overridden by passing a different value for the sig parameter. 
+        /// The resulting kernel values are returned as an array.
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="l"></param>
+        /// <param name="sig"></param>
+        /// <returns></returns>
         static double[] GKern(double c, int l, double sig = 10.0)
         {
             double[] ax = Enumerable.Range(1, l).Select(i => i - c).ToArray();
@@ -77,6 +89,15 @@ namespace MouseTracking
             return kernel;
         }
 
+        /// <summary>
+        /// This function calculates the outer product of two given vectors, a and b. 
+        /// It creates a new two-dimensional array result with dimensions height and width, 
+        /// which is filled with the products of each element of a with each element of b. 
+        /// The resulting two-dimensional array is then returned.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
         static double[,] OuterProduct(double[] a, double[] b)
         {
             int height = a.Length;
@@ -92,6 +113,16 @@ namespace MouseTracking
             return result;
         }
 
+        /// <summary>
+        /// Defines a method named AddMatrices that takes in two 2D arrays (a and b) of the same size 
+        /// and returns their element-wise sum in a new 2D array (result). 
+        /// The method iterates over each element in the arrays using nested for loops and adds the corresponding elements in a and b. 
+        /// The resulting element is then stored in the corresponding location in result. 
+        /// The resulting result array is returned.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
         static double[,] AddMatrices(double[,] a, double[,] b)
         {
             int height = a.GetLength(0);
@@ -107,6 +138,15 @@ namespace MouseTracking
             return result;
         }
 
+        /// <summary>
+        /// Takes a 2D double array 'arr' and a scalar value 'scalar' as inputs, 
+        /// and returns the result of multiplying each element in arr by scalar in a new 2D double array result. 
+        /// The height and width variables are used to determine the size of arr and result, 
+        /// and two nested for loops iterate through each element of arr and calculate the corresponding element in result.
+        /// </summary>
+        /// <param name="arr"></param>
+        /// <param name="scalar"></param>
+        /// <returns></returns>
         static double[,] MultiplyScalar(double[,] arr, double scalar)
         {
             int height = arr.GetLength(0);
@@ -122,6 +162,11 @@ namespace MouseTracking
             return result;
         }
 
+        /// <summary>
+        /// takes a two-dimensional array of doubles as input and returns the maximum value found in the array.
+        /// </summary>
+        /// <param name="arr"></param>
+        /// <returns></returns>
         static double GetMax(double[,] arr)
         {
             double max = double.MinValue;
@@ -140,6 +185,12 @@ namespace MouseTracking
             return max;
         }
 
+        /// <summary>
+        /// Converts the intensity value to a grayscale color, and sets the corresponding pixel in the bitmap to this color.
+        /// saves bitmap as a JPEG file
+        /// </summary>
+        /// <param name="heatmap"></param>
+        /// <returns></returns>
         private async Task SaveHeatmapAsync(double[,] heatmap)
         {
             int height = heatmap.GetLength(0);
