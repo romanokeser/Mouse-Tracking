@@ -7,6 +7,7 @@ using MoreLinq;
 using MoreLinq.Extensions;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace MouseTracking
 {
@@ -24,34 +25,32 @@ namespace MouseTracking
 
         private async Task ProcessHeatmapAsync()
         {
-            using (StreamReader reader = new StreamReader("MouseCoords.txt"))
-            {
-                double[,] coordinates = null;
-                string line;
-                int row = 0;
-                while ((line = await reader.ReadLineAsync()) != null)
-                {
-                    string[] values = line.Split(',');
-                    if (coordinates == null)
-                    {
-                        coordinates = new double[values.Length, values.Length];
-                    }
-                    for (int col = 0; col < values.Length; col++)
-                    {
-                        coordinates[row, col] = double.Parse(values[col]);
-                    }
-                    row++;
-                }
+            double[][] coordinates = File.ReadAllLines("MouseCoords.txt")
+                                          .Select(line => line.Split(',')
+                                                                .Select(str => double.Parse(str))
+                                                                .ToArray())
+                                          .ToArray();
 
-                double[,] heatmap = await Task.Run(() => MakeHeatmap(coordinates));
-                heatmap = MultiplyScalar(heatmap, 255.0 / GetMax(heatmap));
-                await SaveHeatmapAsync(heatmap);
-            }
+            double[,] coordinates2D = coordinates.ToRectangularArray();
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            double[,] heatmap = await Task.Run(() => MakeHeatmap(coordinates2D));
+            stopwatch.Stop();
+            TimeSpan ts = stopwatch.Elapsed;
+            Console.WriteLine($"MakeHeatmap execution time: {ts.TotalMilliseconds} ms");
+
+            heatmap = MultiplyScalar(heatmap, 255.0 / GetMax(heatmap));
+            await SaveHeatmapAsync(heatmap);
         }
 
 
 
-
+        /// <summary>
+        /// Creates a heatmap from a 2D array of mouse coordinates using Gaussian kernels
+        /// Uses parallel processing
+        /// </summary>
+        /// <param name="coordinates"></param>
+        /// <returns>2D array of doubles</returns>
         static double[,] MakeHeatmap(double[,] coordinates)
         {
             int height = 1080;
@@ -140,8 +139,6 @@ namespace MouseTracking
             }
             return max;
         }
-
-
 
         private async Task SaveHeatmapAsync(double[,] heatmap)
         {
