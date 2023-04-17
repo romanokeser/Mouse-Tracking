@@ -1,0 +1,22 @@
+﻿<Window x:Class="MouseTracking.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MouseTracking"
+        mc:Ignorable="d"
+        WindowStyle="SingleBorderWindow" 
+        ResizeMode="NoResize" 
+        WindowStartupLocation="CenterScreen"
+
+    Title="MainWindow" Height="450" Width="350">
+    <Grid>
+        <Label Content="Mouse tracking" Height="38" Margin="0,48,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" HorizontalAlignment="Center" Width="160"/>
+        <Button Content="Record new movement" HorizontalAlignment="Center" Height="27" Margin="0,159,0,0" VerticalAlignment="Top" Width="202" Click="RecordNewCoordinates_Btn"/>
+        <Button Content="Show me grid results" HorizontalAlignment="Center" Height="27" Margin="0,207,0,0" VerticalAlignment="Top" Width="201" Click="ShowGridResults_Btn"/>
+        <Button Content="Generate heatmap JPEG (very slow)" HorizontalAlignment="Center" Height="27" Margin="0,254,0,0" VerticalAlignment="Top" Width="201" Click="ShowHeatmapJPEG_Btn"/>
+
+    </Grid>
+
+
+</Window>
