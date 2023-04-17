@@ -3,10 +3,7 @@ using System.Linq;
 using System.Windows;
 using System.IO;
 using System.Drawing;
-using MoreLinq;
-using MoreLinq.Extensions;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace MouseTracking
