@@ -5,6 +5,7 @@ using System.IO;
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace MouseTracking
 {
@@ -22,25 +23,35 @@ namespace MouseTracking
 
         private async Task ProcessHeatmapAsync()
         {
-            // Read the text file "MouseCoords.txt" and parse each line into an array of doubles
-            double[][] coordinates = File.ReadAllLines("MouseCoords.txt")
-                                          .Select(line => line.Split(',')
-                                                                .Select(str => double.Parse(str))
-                                                                .ToArray())
-                                          .ToArray();
+            // Read the text file "MouseCoords.txt" asynchronously and parse each line into an array of doubles
+            string[] lines = await File.ReadAllLinesAsync("MouseCoords.txt");
+            List<double[]> coordinatesList = new List<double[]>(lines.Length);
 
-            double[,] coordinates2D = coordinates.ToRectangularArray();     // Convert the jagged array of doubles to a rectangular 2D array
+            Parallel.ForEach(lines, line =>
+            {
+                double[] coordinate = line.Split(',')
+                                          .Select(str => double.Parse(str))
+                                          .ToArray();
+                coordinatesList.Add(coordinate);
+            });
+
+            double[][] coordinates = coordinatesList.ToArray();
+            double[,] coordinates2D = coordinates.ToRectangularArray(); // Convert the jagged array to a 2D rectangular array
 
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            double[,] heatmap = await Task.Run(() => MakeHeatmap(coordinates2D));// Calculate the heatmap using the MakeHeatmap method
+            double[,] heatmap = await Task.Run(() => MakeHeatmap(coordinates2D)); // Calculate the heatmap using the MakeHeatmap method
             stopwatch.Stop();
+
 
             TimeSpan ts = stopwatch.Elapsed;
             Console.WriteLine($"MakeHeatmap execution time: {ts.TotalMilliseconds} ms");
 
             heatmap = MultiplyScalar(heatmap, 255.0 / GetMax(heatmap));     // Normalize the heatmap by multiplying it with a scaling factor and save it to a file
             await SaveHeatmapAsync(heatmap);
+
+            EnableUIToOpeningHeatmapImage(true);    //enable UI for opening the image
+
         }
 
         /// <summary>
@@ -52,7 +63,7 @@ namespace MouseTracking
         static double[,] MakeHeatmap(double[,] coordinates)
         {
             int height = 1080;
-            int width = 2048;
+            int width = 1920;
             double[,] heatmap = new double[height, width];
             Parallel.For(0, coordinates.GetLength(0), i =>
             {
@@ -207,6 +218,25 @@ namespace MouseTracking
             {
                 await Task.Run(() => bmp.Save(fs, System.Drawing.Imaging.ImageFormat.Jpeg));
             }
+        }
+
+        private void OpenHeatmapImage_Btn(object sender, RoutedEventArgs e)
+        {
+            string outputDir = AppDomain.CurrentDomain.BaseDirectory;
+            string imagePath = Path.Combine(outputDir, "heatmap.jpg");
+            Process.Start(new ProcessStartInfo(imagePath) { UseShellExecute = true });
+        }
+
+        /// <summary>
+        /// Pause progress bar and enable the button
+        /// </summary>
+        private void EnableUIToOpeningHeatmapImage(bool isEnable)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                openHeatmapBtn.IsEnabled = isEnable;
+                progressBar.IsIndeterminate = !isEnable;
+            });
         }
     }
 }

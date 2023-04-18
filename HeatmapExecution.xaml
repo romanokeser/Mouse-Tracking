@@ -7,6 +7,12 @@
         mc:Ignorable="d"
         Title="HeatmapExecution" Height="450" Width="800">
     <Grid>
-        
+        <ProgressBar x:Name="progressBar" Value="0" Minimum="0" Maximum="100" Width="400" Height="3"
+             Background="LightGray" Foreground="DarkBlue"
+             BorderBrush="DarkGray" BorderThickness="1"
+             IsIndeterminate="True" />
+        <Label Content="Generating heatmap..." HorizontalAlignment="Center" Height="31" Margin="0,150,0,0" HorizontalContentAlignment="Center" VerticalAlignment="Top" Width="190"/>
+        <Button x:Name="openHeatmapBtn" Content="Open heatmap" HorizontalAlignment="Left" Height="32" Margin="341,305,0,0" VerticalAlignment="Top" Width="101" IsEnabled="False" Click="OpenHeatmapImage_Btn"/>
+
     </Grid>
 </Window>
