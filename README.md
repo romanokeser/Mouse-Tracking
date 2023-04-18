@@ -19,3 +19,5 @@ saving bitmap as a JPEG, a very slow execution time (around 1:30s)
 ![alt text](https://github.com/romanokeser/Mouse-Tracking/blob/main/ProgressImages/heatmap.jpg)
 -----
 
+First UI look
+![alt text](https://github.com/romanokeser/Mouse-Tracking/blob/main/ProgressImages/firstUI.png)
