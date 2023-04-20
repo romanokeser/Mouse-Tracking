@@ -63,5 +63,12 @@ namespace MouseTracking
                 writer.WriteLine($"({point.X}, {point.Y})");
             }
         }
+
+
+
+        private void daaaaaabztt(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

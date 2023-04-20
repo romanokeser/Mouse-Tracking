@@ -17,7 +17,7 @@
 
             <RadioButton Content="Right hand" GroupName="Options" Height="34" Width="89" Margin="213,148,0,199" IsChecked="True" />
             <RadioButton Content="Left hand" GroupName="Options" Height="30"  Margin="133,148,94,203"/>
-            <Button Content="Record" HorizontalAlignment="Center" Height="23" Margin="0,301,0,0" VerticalAlignment="Top" Width="182" Click="Button_Click_1"/>
+            <Button Content="Record" HorizontalAlignment="Left" Height="20" Margin="84,310,0,0" VerticalAlignment="Top" Width="145"/>
         </Grid>
 
     </Grid>
