@@ -26,7 +26,8 @@ namespace MouseTracking
 
         private void RecordNewCoordinates_Btn(object sender, RoutedEventArgs e)
         {
-            
+            RegistrationMovement registrationMovement = new RegistrationMovement();
+            registrationMovement.Show();
         }
 
         private void ShowGridResults_Btn(object sender, RoutedEventArgs e)
