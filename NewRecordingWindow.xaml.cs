@@ -1,18 +1,26 @@
-﻿using Microsoft.Toolkit.Uwp.Notifications;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Xml;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 
 namespace MouseTracking
 {
     /// <summary>
-    /// Interaction logic for RegistrationMovement.xaml
+    /// Interaction logic for NewRecordingWindow.xaml
     /// </summary>
-    public partial class RegistrationMovement : Window
+    public partial class NewRecordingWindow : Window
     {
         private Timer timer;
         private StreamWriter writer;
@@ -27,7 +35,7 @@ namespace MouseTracking
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool GetCursorPos(out POINT lpPoint);
 
-        public RegistrationMovement()
+        public NewRecordingWindow()
         {
             InitializeComponent();
         }
@@ -55,19 +63,5 @@ namespace MouseTracking
                 writer.WriteLine($"({point.X}, {point.Y})");
             }
         }
-
-
-        private void Button_Click_1(object sender, RoutedEventArgs e)
-        {
-            new ToastContentBuilder()
-    .AddArgument("action", "viewConversation")
-    .AddArgument("conversationId", 9813)
-    .AddText("Andrew sent you a picture")
-    .AddText("Check this out, The Enchantments in Washington!");
-    
-
-
-        }
-
     }
 }
