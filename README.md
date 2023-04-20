@@ -21,3 +21,7 @@ saving bitmap as a JPEG, a very slow execution time (around 1:30s)
 
 First UI look
 ![alt text](https://github.com/romanokeser/Mouse-Tracking/blob/main/ProgressImages/firstUI.png)
+-----
+
+Register new mouse recording 
+![alt text](https://github.com/romanokeser/Mouse-Tracking/blob/main/ProgressImages/newrecording.png)
